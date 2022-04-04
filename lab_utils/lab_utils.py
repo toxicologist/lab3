@@ -4,6 +4,7 @@ from uncertainties import unumpy as un
 from uncertainties.unumpy import uarray
 from numpy import array
 from math import pi, sqrt
+from scipy import constants as const
 import matplotlib.pyplot as plt
 import uncertainties
 import numpy as np
