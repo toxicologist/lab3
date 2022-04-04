@@ -86,10 +86,11 @@ if 0:
 # aluminio
 
 incert_x = 1
-incert_mv_al = 0.1
+incert_mv_al = 0.1e-3
 x_aluminio = array([4, 8, 12, 16, 20, 24, 28, 32, 36, 41, 44, 48, 52, 56, 60])
 mV_aluminio = array([0.1, 0.4, 0.7, 1, 1.3, 1.6, 2.1, 2.4, 2.9, 3.3, 4.1, 4.9, 5.8, 6.7, 7.6])
-espessura_aluminio = 0.09
+mV_aluminio *= 1e-3
+espessura_aluminio = 0.09e-3 # mm -> m
 
 x_al = nom_ar(x_aluminio)
 mv_al = nom_ar(mV_aluminio)
@@ -108,7 +109,10 @@ plt.text(40, 6, '40cm (L=1cm)', ha='center', va='center',rotation='vertical', ba
 locs = {3: 20, 2: 41, 1: 60}
 colors = {3: 'r', 2:'g', 1: 'pink'}
 loc_prev = 0
-for i in range(0): # vai de 3 -> 2 -> 1
+campo_el = []
+jotas = []
+
+for i in range(3, 0, -1): # vai de 3 -> 2 -> 1
     until = x_aluminio.tolist().index(locs[i])
     alpha, delta_a, beta, delta_b, delta_y = minimo_quadrado(x_aluminio[loc_prev:until+1], mV_aluminio[loc_prev:until+1])
     x = np.linspace(x_aluminio[loc_prev], x_aluminio[until], 10)
@@ -119,13 +123,41 @@ for i in range(0): # vai de 3 -> 2 -> 1
     plt.plot(x, reta, c=colors[i], lw='1', label='Linearização para %scm (a=%.2f, b=%.2f)' % (i, alpha, beta))
     plt.plot(x, reta_max, c='b', ls=':', lw='1')
     plt.plot(x, reta_min, c='b', ls=':', lw=1)
+
+
+
+    # calculando campo eletrico
+    delta_v = uf(mV_aluminio[until], incert_mv_al) - uf(mV_aluminio[loc_prev], incert_mv_al)
+    #delta_v *= 1e-3 # mV -> volts
+    delta_x = x_aluminio[until] - x_aluminio[loc_prev]
+    E = delta_v / delta_x
+    campo_el.append(E)
+    print("Campo eletrico calculado para regiao de %scm: %s N/C" % (i, E))
+
+    rho = 2.82*1e-8 # rho do aluminio
+    area = espessura_aluminio * i * 1e-2
+    a = uf(alpha, delta_a)
+    J = a/rho
+    jotas.append(J)
+    print("Densidade de corrente calculada: %s A/m^2" % J)
+
+    print("Corrente calculada: %s A" % (J*area))
+    print('\n')
+
+    
+
     loc_prev = until
     
 
-plt.title("Gráfico de posição x tensão")
+plt.title("Gráfico de posição x tensão com incertezas")
 
 
 plt.legend(loc='best')
 
 
 plt.show()
+
+alpha, delta_a, beta, delta_b, delta_y = grafico_mmq(nom_ar(campo_el), nom_ar(jotas), "Campo elétrico (N/C)", "Densidade de corrente (A/m^2)", show=True)
+condutividade = uf(alpha, delta_a)
+print(f"Condutividade calculada: {condutividade}; resistividade (inverso): {1/condutividade}")
+print(f"Condutividade esperada: {1/rho}; resistividade esperada: %.2e" % rho)
