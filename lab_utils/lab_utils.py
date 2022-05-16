@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import uncertainties
 import numpy as np
 import math
+from uncertainties import umath
 
 def e_c(m, v):
     # energia cinética (1/2 m v**2)
