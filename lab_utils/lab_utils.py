@@ -185,6 +185,9 @@ def grafico_mmq(x_val, y_val, x_label, y_label, annotate=None,save=False, filena
     """
     alpha, delta_a, beta, delta_b, delta_y = minimo_quadrado(x_val, y_val)
 
+    if not show:
+        return alpha, delta_a, beta, delta_b, delta_y
+    
     x = np.linspace(x_val[0], x_val[-1], 10)
 
     reta = alpha*x + beta
@@ -206,7 +209,8 @@ def grafico_mmq(x_val, y_val, x_label, y_label, annotate=None,save=False, filena
     plt.ylabel(y_label)
 
     if not title:
-        plt.title(f'Gráfico de {x_label} x {y_label}')
+        pass
+        #plt.title(f'Gráfico de {x_label} x {y_label}')
     else:
         plt.title(title)
 
