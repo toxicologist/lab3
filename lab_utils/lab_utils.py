@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import uncertainties
 import numpy as np
 import math
+import csv
 from uncertainties import umath
 
 def e_c(m, v):
@@ -234,6 +235,21 @@ def open_print(title=''):
 
 def close_print():
     print('--------------\n')
+
+def read_csv(filename: str, columns: int):
+    # Returns numpy arrays for each column in a csv file
+    dados = {}
+    for i in range(columns):
+        dados[i] = []
+
+    with open(filename, newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            for i in range(columns):
+                if row[i] != '':
+                    dados[i].append(float(row[i]))
+
+    return [np.array(x) for x in dados.values()]
 
 g = 9.81
 avo = 6.0221415000000003e+023
